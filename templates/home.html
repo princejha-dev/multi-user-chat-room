@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 style="text-align: center;">Chat App</h2>
+<div class="form-box">
+    <form method="post">
+        <label>Enter Your Name</label>
+        <input type="text" placeholder="name" name="name" value={{name}}>
+        <div class="join">
+            <input type="text" placeholder="enter the code" name="code" value={{code}}>
+            <button type="submit" value="join" name="join">join room</button>
+        </div>
+        <button type="submit" name="create" class="create">create room</button>
+
+        {% if error %}
+        <ul>
+            <li>{{error}}</li>
+        </ul>
+        {% endif %}
+    </form>
+</div>
+
+{% endblock %}
