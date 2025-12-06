@@ -1,15 +1,17 @@
 from flask import Flask , render_template , redirect , url_for , request , session
 from flask_socketio import SocketIO , send , join_room , leave_room
+import os
 import random
 from string import ascii_uppercase
 
 app=Flask(__name__)
 app.config["SECRET_KEY"]="HSDHEUEBSBAJHDH" #REPLACE WITH ACTUAL KEY
 
-socketio=SocketIO(app)
+socketio=SocketIO(app , async_mode="eventlet" , cors_allowed_origins="*")
 
 rooms={}
 
+#generate unique room code
 def generate_room_code(len):
     while True:
         code=""
@@ -32,7 +34,6 @@ def home():
         create=request.form.get("create",False)
 
        
-
         if not name:
             return render_template("home.html" , error="please enter a name" , name=name ,code=code)
         
@@ -75,14 +76,16 @@ def message(data):
     if room not in rooms:
         return
     
+    msg_text = data['data'] if isinstance(data , dict) and 'data' in data else data
+    
     content ={
         "name":name,
-        "message":data["data"]
+        "message":msg_text
     }
 
-    send(content , to=room)
+    send(content , room=room)
     rooms[room]["messages"].append(content)
-    print(f"{session.get('name')} has said {data['data']}")
+   # print(f"{session.get('name')} has said {msg_text}")
 
 @socketio.on("connect")
 def connect(auth):
@@ -98,9 +101,9 @@ def connect(auth):
     
     join_room(room)
 
-    send({"name" : name , "message": "has entered the room"} , to=room)
+    send({"name" : name , "message": "has entered the room"} , room=room)
     rooms[room]["members"]+=1
-    print(f"{name} joined the room {room}")
+    #print(f"{name} joined the room {room}") 
 
 
 @socketio.on("disconnect")
@@ -114,9 +117,9 @@ def disconnect():
         if rooms[room]["members"]<=0:
             del rooms[room]
     
-    send({"name" : name , "message": "has left the room"} , to=room)
-    print(f"{name} left the room {room}")
+    send({"name" : name , "message": "has left the room"} , room=room)
+   # print(f"{name} left the room {room}")
 
 
 if __name__=="__main__":
-    socketio.run(app,debug=True)
+    socketio.run(app, host="0.0.0.0",port=int(os.environ.get("PORT",5000)) ,debug=True)

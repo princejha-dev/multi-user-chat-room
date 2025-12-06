@@ -18,13 +18,16 @@ A simple real-time chat application built with **Flask** and **Flask-SocketIO**.
 ```
 project/
 ├── app.py
-├── requirement.txt
+├── Procfile
+├── requirements.txt
+├── .gitignore
 ├── templates/
 │   ├── base.html
-│   └── home.html
-|   └── room.html
+│   ├── home.html
+│   └── room.html
 └── static/
     └── style.css
+
 ```
 
 ---
@@ -111,7 +114,7 @@ app.config["SECRET_KEY"] = "your-secure-key-here"
 
 * Add user list panel in room
 * Store history using a database instead of memory
-* Implement typing indicators
+* Implement permanent date in chat room
 * Add authentication system
 
 ---
